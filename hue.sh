@@ -38,7 +38,11 @@ lights='3 4'								# Define the lights you want to use, e.g. '3' or '3 4' or '3
 
 function usage {
 	# cmdname is defined in the library
-	echo "Usage: $cmdname [link | unlink | discover | config]"
+	echo "Usage: $cmdname -onoff on|off light"
+	echo "Usage: $cmdname -get light"
+	# HSL stands for hue, saturation, and lightness (or luminosity)
+	echo "Usage: $cmdname -color hue(0-65535) saturation(0-255) brightness(0-255) light"
+	echo "Usage: $cmdname -alert light"
 }
 
 
@@ -52,21 +56,21 @@ cmdname=`basename "$0"`
 
 
 # very simple argument processing
-if [[ $# == 1 ]]
+if [[ $# > 0 ]]
 	then 
 	# valid number of arguments
-	if [[ $1 == "link" ]]
+	if [[ $1 == "-onoff" ]]
 	then
-		bridge_link
-	elif [[ $1 == "unlink" ]]
+		hue_onoff $2 $3
+	elif [[ $1 == "-get" ]]
 	then
-		bridge_unlink
-	elif [[ $1 == "config" ]]
-	then	
-		bridge_config
-	elif [[ $1 == "discover" ]]
+		hue_getstate $2
+	elif [[ $1 == "-color" ]]
 	then
-		bridge_discover
+		hue_on_hue_sat_brightness $2 $3 $4 $5
+	elif [[ $1 == "-alert" ]]
+	then
+		hue_alert on $2
 	else
 		usage	
 	fi
@@ -74,7 +78,7 @@ if [[ $# == 1 ]]
 	echo		# force new line
 	exit
 else 
-	if (( $# > 1 )) 
+	if (( $# < 1 )) 
 	then
 		# more than one argument, show usage
 		usage
@@ -88,7 +92,7 @@ fi
 
 
 # demo mode, call function demo with the lights 3 and 4
-hue_demo $lights
+#hue_demo $lights
 
 # hue_onoff "on" 3
 # hue_is_on 3
